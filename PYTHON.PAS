@@ -2,20 +2,22 @@
 program PythonGame;
 
 const
+{main constants}
   cdelay = 100;    { for delay: mSec) }
   max_x = 89;      { display width-1  }
   max_y = 29;      { display high-1   }
-  max_len = 1023;  { max length python }
+  max_len = 2048;  { max length python }
   wf = 5;          { weight frog }
   pylen = 5;       { initial length python }
   CTry = 5;      { try's }
 
-{ controls keys }
+{ control keys }
   _ESC = #27;
   _RIGHT = #4;
   _LEFT = #19;
   _UP = #5;
   _DOWN = #24;
+  _PAUSE = 'p';
 
 { ANSI screen attributes }
   _CLS = #27'[2J';
@@ -31,6 +33,7 @@ const
   _CYAN = #27'[36m';
   _WHITE = #27'[37m';
   _CR = #13;
+  _LF= #10;
 
 type
     tpython = record
@@ -75,6 +78,31 @@ begin
    write(_GREEN);
 end;
 
+procedure Intro;
+begin
+     write(_CLS,_ATR,_COFF); gotoxy(0,0);
+     writeln(_CYAN,'Python L(c)P 2020.');
+     writeln('All rights reserved.');
+     write(_GREEN);
+     gotoxy((max_x div 2)-23,(max_y div 2)-2);
+     writeln('PPPPP   YY  YY  TTTTTT  HH  HH   OOOO   NN  NN');
+     gotoxy((max_x div 2)-23,(max_y div 2)-1);
+     writeln('PP  PP  YY  YY    TT    HH  HH  OO  OO  NNN NN');
+     gotoxy((max_x div 2)-23,(max_y div 2));
+     writeln('PP  PP   YYYY     TT    HHHHHH  OO  OO  NNNNNN');
+     gotoxy((max_x div 2)-23,(max_y div 2)+1);
+     writeln('PPPPP     YY      TT    HH  HH  OO  OO  NN NNN');
+     gotoxy((max_x div 2)-23,(max_y div 2)+2);
+     writeln('PP        YY      TT    HH  HH  OO  OO  NN  NN');
+     gotoxy((max_x div 2)-23,(max_y div 2)+3);
+     writeln('PP        YY      TT    HH  HH   OOOO   NN  NN');
+     gotoxy((max_x div 2)-5,(max_y div 2)+5);
+     write(_YELLOW,'Press Enter');
+      repeat
+         read(Kbd, c);
+      until c=_CR;
+end;
+
 function CheckCollision(xx,yy:byte):boolean;
 var
    ptr: integer;
@@ -107,16 +135,18 @@ begin
    write(_CYAN,' Score: ',py.len,'  Python''s: ',try,' ',_GREEN);
 end;
 
+{ MAIN LOOP }
 begin
+Intro;
 try:=CTry; py.len:=pylen;
 repeat
-   write(_CLS,_ATR,_COFF);
+   ClrScr;
    DrawBorder;
 
    py.dx:=1; py.dy:=0;
    py.lfact:=0;
    py.head:=0; py.tail:=0;
-   py.x[py.head]:=10; py.y[py.head]:=10;
+   py.x[py.head]:=2; py.y[py.head]:=max_y div 2;
    Score;
 
    NewFrog;
@@ -173,6 +203,15 @@ repeat
                             py.dx:=0;
                           end;
                 _ESC: game:=false;
+                _PAUSE: begin
+                        gotoxy((max_x div 2)-10,max_y);
+                        write(_YELLOW,' PAUSE. Press Enter. ');
+                        repeat
+                              read(Kbd, c);
+                        until c=_CR;
+                        DrawBorder;
+                        Score;
+                end;
            end;
    end;
    try:=try-1;
@@ -195,4 +234,4 @@ until c=_CR;
 
 writeln(_CLS,_ATR,_CON,_CR);
 end.
-
+
